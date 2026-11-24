@@ -1,0 +1,8 @@
+'use client';
+import {Activity,Radio,Zap} from 'lucide-react';
+import {RealtimeSession} from '@/lib/types';
+export default function RealtimePanel({session}:{session:RealtimeSession|null}){
+ if(!session)return null;
+ const max=Math.max(1,...session.genre_affinity.map(x=>Math.abs(x.score)));
+ return <section className="realtime-panel" id="realtime"><div className="realtime-head"><div><div className="eyebrow">✦ PHASE 4 / STREAMING INTELLIGENCE</div><h2>Live Session Personalization</h2><p>Kafka events are consumed into Redis features and used to re-rank your feed without retraining the offline model.</p></div><span className="live-dot ready"><Radio size={13}/> LIVE</span></div><div className="realtime-grid"><div className="affinity-card"><h3><Zap size={16}/> Session genre affinity</h3>{session.genre_affinity.length?session.genre_affinity.slice(0,8).map(x=><div className="affinity-row" key={x.genre}><span>{x.genre}</span><div><i className={x.score<0?'negative':''} style={{width:`${Math.min(100,Math.abs(x.score)/max*100)}%`}}/></div><b>{x.score>0?'+':''}{x.score.toFixed(2)}</b></div>):<p className="muted">Interact with titles to build your live session profile.</p>}</div><div className="event-card"><h3><Activity size={16}/> Live event stream <small>{session.event_count} events</small></h3><div className="event-list">{session.recent_events.slice(0,8).map((e,i)=><div className="event-row" key={`${e.occurred_at}-${i}`}><code>{e.event_type.toUpperCase()}</code><span>{e.title??`Content ${e.content_id??'—'}`}</span><small>{e.genre??''}</small></div>)}{!session.recent_events.length&&<p className="muted">No streamed events yet.</p>}</div></div></div></section>
+}
